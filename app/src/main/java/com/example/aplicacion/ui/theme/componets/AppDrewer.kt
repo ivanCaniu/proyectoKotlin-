@@ -52,7 +52,7 @@ fun AppDrawer(
 
                 NavigationDrawerItem(
                     label = { Text("Cerrar Sesión") },
-                    selected = currentRoute == Screen.Registro.route,
+                    selected = currentRoute == Screen.Login.route,
                     onClick = {
                         scope.launch { drawerState.close() }
                         if (currentRoute != Screen.Login.route) {
