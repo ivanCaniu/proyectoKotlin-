@@ -55,7 +55,7 @@ fun AppDrawer(
                     selected = currentRoute == Screen.Registro.route,
                     onClick = {
                         scope.launch { drawerState.close() }
-                        if (currentRoute != Screen.Registro.route) {
+                        if (currentRoute != Screen.Login.route) {
                             viewModel.navigateTo(Screen.Registro)
                         }
                     }
