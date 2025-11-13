@@ -48,10 +48,10 @@ fun HomeScreen(viewModel: MainViewModel, navController: NavController) {
         ) { innerPadding ->
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize() ,
+                    .fillMaxSize()
+                    .padding(innerPadding),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(
                     items = listaDeEjercicios,

@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -77,5 +79,13 @@ fun LoginScreen(
             enabled = !estado.isLoading,
             isLoading = estado.isLoading
         )
+
+        TextButton(
+            onClick = { navController.navigate("registro") },
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            enabled = !estado.isLoading
+        ) {
+            Text("¿No tienes una cuenta? Regístrate")
+        }
     }
 }

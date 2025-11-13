@@ -34,6 +34,15 @@ class MainViewModel: ViewModel() {
         navigateTo(screen.route, popUpTo?.route, inclusive, singleTop)
     }
 
+    fun onLogoutClick() {
+
+        navigateTo(
+            route = Screen.Login.route,
+            popUpTo = Screen.Home.route,
+            inclusive = true
+        )
+    }
+
     fun navigateBack(){
         CoroutineScope(Dispatchers.Main).launch {
             _navigationsEvents.emit(NavigationEvent.PopBackStack)

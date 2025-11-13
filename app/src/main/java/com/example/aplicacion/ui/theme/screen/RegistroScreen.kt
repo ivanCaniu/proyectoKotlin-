@@ -13,6 +13,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -112,6 +113,10 @@ fun RegistroScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        estado.errores.aceptaTerminos?.let {
+            Text(text = it, color = MaterialTheme.colorScheme.error)
+        }
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
                 checked = estado.aceptaTerminos,
@@ -121,17 +126,23 @@ fun RegistroScreen(
             Text(text = "Acepto los términos y condiciones")
         }
 
-        estado.errores.aceptaTerminos?.let {
-            Text(text = it, color = MaterialTheme.colorScheme.error)
-        }
 
-        Spacer(modifier = Modifier.height(16.dp)) // Corregido
 
+        Spacer(modifier = Modifier.height(16.dp))
         PrimaryButton(
             text = "Registrarse",
             onClick = { viewModel.onRegistroClick() },
             enabled = !estado.isLoading,
             isLoading = estado.isLoading
         )
+
+
+        TextButton(
+            onClick = { navController.navigate("login") },
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            enabled = !estado.isLoading
+        ) {
+            Text("¿Ya tienes una cuenta? Inicia sesión")
+        }
     }
 }

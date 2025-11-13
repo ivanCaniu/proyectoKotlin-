@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -11,9 +14,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.aplicacion.navegation.NavigationEvent
 import com.example.aplicacion.navegation.Screen
@@ -25,16 +25,20 @@ import com.example.aplicacion.ui.theme.screen.ProfileScreen
 import com.example.aplicacion.ui.theme.screen.RegistroScreen
 import com.example.aplicacion.viewmodel.MainViewModel
 import com.example.aplicacion.viewmodel.UsuarioViewModel
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import kotlinx.coroutines.flow.collectLatest
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             AplicacionTheme {
                 val viewModel: MainViewModel = viewModel()
-                val navController = rememberNavController()
+                val navController = rememberAnimatedNavController()
 
                 LaunchedEffect(key1 = Unit) {
                     viewModel.navigationsEvents.collectLatest { event ->
@@ -59,9 +63,9 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
-                    NavHost(
+                    AnimatedNavHost(
                         navController = navController,
-                        startDestination = Screen.Login.route,
+                        startDestination = Screen.Home.route,
                         modifier = Modifier.padding(paddingValues = innerPadding)
                     ) {
                         composable(route = Screen.Home.route) {
@@ -86,7 +90,31 @@ class MainActivity : ComponentActivity() {
 
                         composable(
                             route = "ejercicio_detail/{ejercicioId}",
-                            arguments = listOf(navArgument("ejercicioId") { type = NavType.StringType })
+                            arguments = listOf(navArgument("ejercicioId") { type = NavType.StringType }),
+                            enterTransition = {
+                                slideIntoContainer(
+                                    AnimatedContentTransitionScope.SlideDirection.Left,
+                                    animationSpec = tween(700)
+                                )
+                            },
+                            exitTransition = {
+                                slideOutOfContainer(
+                                    AnimatedContentTransitionScope.SlideDirection.Left,
+                                    animationSpec = tween(700)
+                                )
+                            },
+                            popEnterTransition = {
+                                slideIntoContainer(
+                                    AnimatedContentTransitionScope.SlideDirection.Right,
+                                    animationSpec = tween(700)
+                                )
+                            },
+                            popExitTransition = {
+                                slideOutOfContainer(
+                                    AnimatedContentTransitionScope.SlideDirection.Right,
+                                    animationSpec = tween(700)
+                                )
+                            }
                         ) { backStackEntry ->
                             val ejercicioId = backStackEntry.arguments?.getString("ejercicioId")
                             if (ejercicioId != null) {
