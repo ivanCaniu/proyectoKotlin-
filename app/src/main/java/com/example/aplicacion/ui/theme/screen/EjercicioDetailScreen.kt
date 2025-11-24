@@ -1,9 +1,11 @@
 package com.example.aplicacion.ui.theme.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -19,12 +21,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.aplicacion.data.getEjercicioById
 import com.example.aplicacion.model.Ejercicio
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +66,14 @@ fun DetalleContenido(ejercicio: Ejercicio, modifier: Modifier = Modifier) {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
+        Image(
+            painter = painterResource(id = ejercicio.imageRes),
+            contentDescription = "Imagen del ejercicio ${ejercicio.name}",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp),
+            contentScale = ContentScale.Crop
+        )
 
         Column(modifier = Modifier.padding(16.dp)) {
             Text(

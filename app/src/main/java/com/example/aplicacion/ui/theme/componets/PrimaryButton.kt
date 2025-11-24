@@ -9,27 +9,29 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.aplicacion.ui.theme.primaryButtonColors
 
 @Composable
 fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
     enabled: Boolean,
-    isLoading: Boolean = false, // <-- 1. Nuevo parámetro
+    isLoading: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Button(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        enabled = enabled && !isLoading
+        enabled = enabled && !isLoading,
+        colors = primaryButtonColors()
     ) {
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(24.dp),
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onBackground
             )
         } else {
-            // 4. Si no, muestra el texto normal
+
             Text(text)
         }
     }

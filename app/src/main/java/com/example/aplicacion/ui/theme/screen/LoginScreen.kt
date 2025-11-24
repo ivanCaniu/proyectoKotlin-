@@ -41,14 +41,14 @@ fun LoginScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
-        // Campo de Email
+        // Campo de Nombre
         OutlinedTextField(
-            value = estado.email,
-            onValueChange = { viewModel.onEmailChanged(it) },
-            label = { Text("Email") },
-            isError = estado.errores.email != null,
+            value = estado.nombre,
+            onValueChange = { viewModel.onNombreChanged(it) },
+            label = { Text("Nombre") },
+            isError = estado.errores.nombre != null,
             supportingText = {
-                estado.errores.email?.let {
+                estado.errores.nombre?.let {
                     Text(text = it, color = MaterialTheme.colorScheme.error)
                 }
             },
@@ -71,6 +71,8 @@ fun LoginScreen(
         )
 
         Spacer(modifier = Modifier.weight(1f))
+
+
 
 
         PrimaryButton(

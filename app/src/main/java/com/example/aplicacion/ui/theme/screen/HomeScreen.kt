@@ -1,11 +1,9 @@
 package com.example.aplicacion.ui.theme.screen
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -13,7 +11,6 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -21,10 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.aplicacion.data.listaDeEjercicios
+import com.example.aplicacion.data.listaDeRutinas
 import com.example.aplicacion.navegation.Screen
 import com.example.aplicacion.ui.theme.componets.AppDrawer
-import com.example.aplicacion.ui.theme.componets.EjercicioCard
+import com.example.aplicacion.ui.theme.componets.RutinaCard
 import com.example.aplicacion.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,10 +51,10 @@ fun HomeScreen(viewModel: MainViewModel, navController: NavController) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(
-                    items = listaDeEjercicios,
-                    key = { it.id }
-                ) { ejercicio ->
-                    EjercicioCard(ejercicio = ejercicio, navController = navController)
+                    items = listaDeRutinas,
+                    key = { it.nombre }
+                ) { rutina ->
+                    RutinaCard(rutina = rutina, navController = navController)
                 }
             }
         }

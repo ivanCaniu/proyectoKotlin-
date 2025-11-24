@@ -7,6 +7,11 @@ data class Ejercicio(
     val name: String,
     val description: String,
     val muscleGroup: String,
-    @DrawableRes val imageRes: Int, // Propiedad para la imagen
+    @DrawableRes val imageRes: Int,
     val detailedDescription: String
+)
+
+data class Rutina(
+    val nombre: String,
+    val ejercicios: List<Ejercicio>
 )
