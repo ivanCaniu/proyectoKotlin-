@@ -9,7 +9,7 @@ internal val ejerciciosDeTorso = listOf(
         name = "Flexiones",
         description = "Pecho,hombros,triceps",
         muscleGroup = "Torso",
-        imageRes = R.drawable.ic_launcher_foreground,
+        imageRes = R.drawable.flexione,
         detailedDescription = "Apoya manos al ancho de los hombros.\n" +
                 "Mantén el cuerpo recto como tabla.\n" +
                 "Baja controlado hasta que el pecho casi toque el piso.\n" +
@@ -21,7 +21,7 @@ internal val ejerciciosDeTorso = listOf(
         name = "Remo con Mochila",
         description = "espalda y biceps.",
         muscleGroup = "Torso",
-        imageRes = R.drawable.ic_launcher_foreground,
+        imageRes = R.drawable.remo,
         detailedDescription = " Inclina el torso 45° \n"+
                 "Toma la mochila por las asas. \n"+
                 "Tira hacia tu abdomen. \n"+
@@ -34,7 +34,7 @@ internal val ejerciciosDeTorso = listOf(
         name = "Fondos con Sillas",
         description = "triceps, pecho bajo",
         muscleGroup = "Torso",
-        imageRes = R.drawable.ic_launcher_foreground,
+        imageRes = R.drawable.fondo,
         detailedDescription = "Coloca dos sillas firmes \n"+
                 "Apoya manos atras del cuerpo\n"+
                 "Baja doblando codos hacia atras\n"+
@@ -47,7 +47,7 @@ internal val ejerciciosDeTorso = listOf(
         name = "Elevaciones Laterales",
         description = "hombro lateral",
         muscleGroup = "Torso",
-        imageRes = R.drawable.ic_launcher_foreground,
+        imageRes = R.drawable.laterales,
         detailedDescription = "Brazos a los lados.\n"+
                 "Levanta hasta alinearlos con los hombros.\n"+
                 "Baja lentamente.\n"+
@@ -59,7 +59,7 @@ internal val ejerciciosDeTorso = listOf(
         name = "Curl de biceps",
         description = "biceps",
         muscleGroup = "Torso",
-        imageRes = R.drawable.ic_launcher_foreground,
+        imageRes = R.drawable.biceps,
         detailedDescription = "Manten codos pegados al cuerpo.\n"+
                 "Sube lento aprieta arriba.\n"+
                 "Baja controlado.\n"+
