@@ -1,43 +1,54 @@
 package com.example.aplicacion.ui.theme.screen
-
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.aplicacion.navegation.Screen
-import com.example.aplicacion.ui.theme.componets.AppDrawer
-import com.example.aplicacion.viewmodel.MainViewModel
+import androidx.compose.ui.unit.dp
+import com.example.aplicacion.ui.theme.componets.LogoutButton
+import com.example.aplicacion.ui.theme.componets.MenuSection
+import com.example.aplicacion.ui.theme.componets.ProfileHeader
+import com.example.aplicacion.ui.theme.componets.StatsSection
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(viewModel: MainViewModel, userId: String) {
-    AppDrawer(
-        viewModel = viewModel,
-        currentRoute = Screen.Profile.createRoute(userId) //
-    ) { openDrawer ->
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Perfil de Usuario") },
-                    navigationIcon = {
-                        IconButton(onClick = openDrawer) {
-                            Icon(Icons.Default.Menu, contentDescription = "Abrir menú")
-                        }
-                    }
-                )
-            }
-        ) { paddingValues ->
-            Column(modifier = Modifier.padding(paddingValues)) {
-                Text("Contenido de la pantalla de perfil para el usuario $userId")
-            }
-        }
+fun ProfileScreen(
+    onLogout: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = 16.dp)
+    ) {
+        // 1. Encabezado del perfil
+        ProfileHeader(
+            name = "Ivan", // Puedes obtener esto de un ViewModel
+            email = "ivan.developer@email.com"
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 2. Sección de estadísticas
+        StatsSection()
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 3. Menú de opciones de la cuenta
+        MenuSection()
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 4. Botón para cerrar sesión
+        LogoutButton(onLogout = onLogout)
     }
 }
