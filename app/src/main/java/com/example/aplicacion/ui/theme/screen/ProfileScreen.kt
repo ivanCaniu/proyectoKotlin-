@@ -1,4 +1,5 @@
 package com.example.aplicacion.ui.theme.screen
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,13 +17,16 @@ import com.example.aplicacion.ui.theme.componets.LogoutButton
 import com.example.aplicacion.ui.theme.componets.MenuSection
 import com.example.aplicacion.ui.theme.componets.ProfileHeader
 import com.example.aplicacion.ui.theme.componets.StatsSection
+import com.example.aplicacion.viewmodel.MainViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    onLogout: () -> Unit = {}
+    viewModel: MainViewModel,
+    userId: String
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -32,8 +36,8 @@ fun ProfileScreen(
     ) {
         // 1. Encabezado del perfil
         ProfileHeader(
-            name = "Ivan", // Puedes obtener esto de un ViewModel
-            email = "ivan.developer@email.com"
+            name = "Ivan", // Reemplazar con los datos del usuario, ej: user.value?.name
+            email = "ivan.developer@email.com" // Reemplazar con los datos del usuario, ej: user.value?.email
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -49,6 +53,9 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // 4. Botón para cerrar sesión
-        LogoutButton(onLogout = onLogout)
+        LogoutButton(onLogout = {
+            // Aquí puedes llamar a una función en tu viewModel para cerrar la sesión
+            // viewModel.logout()
+        })
     }
 }
