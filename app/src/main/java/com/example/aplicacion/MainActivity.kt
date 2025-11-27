@@ -10,14 +10,21 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.aplicacion.navegation.AppScreens
 import com.example.aplicacion.navegation.NavigationEvent
-import com.example.aplicacion.navegation.Screen
 import com.example.aplicacion.ui.theme.AplicacionTheme
+import com.example.aplicacion.ui.theme.componets.BottomNavigationBar
+import com.example.aplicacion.ui.theme.screen.AlimetoScreen
 import com.example.aplicacion.ui.theme.screen.EjercicioDetailScreen
 import com.example.aplicacion.ui.theme.screen.HomeScreen
 import com.example.aplicacion.ui.theme.screen.LoginScreen
@@ -61,30 +68,48 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Scaffold(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        val navBackStackEntry by navController.currentBackStackEntryAsState()
+                        val currentDestination = navBackStackEntry?.destination
+                        val showBottomBar = currentDestination?.hierarchy?.any { it.route?.startsWith(AppScreens.Home.route) == true || it.route?.startsWith(AppScreens.Foods.route) == true || it.route?.startsWith(AppScreens.Profile.route) == true } == true
+
+                        if (showBottomBar) {
+                            BottomNavigationBar(navController = navController)
+                        }
+                    }
                 ) { innerPadding ->
                     AnimatedNavHost(
                         navController = navController,
-                        startDestination = Screen.Home.route,
+                        startDestination = AppScreens.Home.route,
                         modifier = Modifier.padding(paddingValues = innerPadding)
                     ) {
-                        composable(route = Screen.Home.route) {
+                        composable(route = AppScreens.Home.route) {
                             HomeScreen(viewModel = viewModel, navController = navController)
                         }
 
+                        composable(route = AppScreens.Foods.route) {
+                            AlimetoScreen()
+                        }
+
                         composable(
-                            route = Screen.Profile.route,
-                            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+                            route = AppScreens.Profile.route + "?userId={userId}",
+                            arguments = listOf(
+                                navArgument("userId") {
+                                    type = NavType.StringType
+                                    defaultValue = ""
+                                }
+                            )
                         ) { backStackEntry ->
                             val userId = backStackEntry.arguments?.getString("userId") ?: ""
                             ProfileScreen(viewModel = viewModel, userId = userId)
                         }
 
-                        composable(route = Screen.Registro.route){
+                        composable(route = "registro"){
                             RegistroScreen(navController = navController, viewModel = viewModel<UsuarioViewModel>())
                         }
 
-                        composable(route = Screen.Login.route){
+                        composable(route = "login"){
                             LoginScreen(navController = navController, viewModel = viewModel<UsuarioViewModel>())
                         }
 
