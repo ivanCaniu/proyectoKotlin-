@@ -22,12 +22,12 @@ import com.example.aplicacion.navegation.AppScreens
 import com.example.aplicacion.navegation.NavigationEvent
 import com.example.aplicacion.ui.theme.AplicacionTheme
 import com.example.aplicacion.ui.theme.componets.BottomNavigationBar
-import com.example.aplicacion.ui.theme.screen.AlimetoScreen
 import com.example.aplicacion.ui.theme.screen.AyudaSoporteScreen
 import com.example.aplicacion.ui.theme.screen.EditarPerfilScreen
 import com.example.aplicacion.ui.theme.screen.EjercicioDetailScreen
 import com.example.aplicacion.ui.theme.screen.HomeScreen
 import com.example.aplicacion.ui.theme.screen.LoginScreen
+import com.example.aplicacion.ui.theme.screen.MealListScreen
 import com.example.aplicacion.ui.theme.screen.NotificacionesScreen
 import com.example.aplicacion.ui.theme.screen.ProfileScreen
 import com.example.aplicacion.ui.theme.screen.RegistroScreen
@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(route = AppScreens.Foods.route) {
-                            AlimetoScreen()
+                            MealListScreen()
                         }
 
                         composable(
