@@ -20,63 +20,56 @@ class MealViewModel : ViewModel() {
     val state = _state.asStateFlow()
 
     init {
+        // Lista de categorías que queremos cargar progresivamente
         val categoriesToFetch = listOf("Seafood", "Breakfast", "Chicken", "Dessert", "Pasta")
-        fetchAllCategories(categoriesToFetch)
+        fetchCategoriesProgressively(categoriesToFetch)
     }
 
-    private fun fetchAllCategories(categories: List<String>) {
+
+    private fun fetchCategoriesProgressively(categories: List<String>) {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
 
+            _state.update { it.copy(isLoading = true, error = null, groupedMeals = emptyMap()) }
 
-            val result = withContext(Dispatchers.IO) {
+            launch(Dispatchers.IO) {
                 try {
 
-                    val categoryResponses = categories.map { categoryName ->
-                        async {
-                            RetrofitClient.mealApiService.getMealsByCategory(categoryName)
+                    categories.forEach { categoryName ->
+
+                        val mealListResponse = RetrofitClient.mealApiService.getMealsByCategory(categoryName)
+                        val mealsFromApi = mealListResponse.meals.take(8) // Limitamos a 8
+
+
+                        val detailedMeals = mealsFromApi.map { meal ->
+                            async {
+                                RetrofitClient.mealApiService.getMealDetails(meal.id)
+                            }
+                        }.awaitAll()
+
+
+                        val customMealInfos = detailedMeals.mapNotNull { response ->
+                            response.meals.firstOrNull()?.toCustomMealInfo()
                         }
-                    }.awaitAll()
 
-                    val allMealsFromApi = categoryResponses.flatMap { it.meals }
 
-                    val detailedMealsDeferred = allMealsFromApi.map { meal ->
-                        async {
-                            RetrofitClient.mealApiService.getMealDetails(meal.id)
+                        val newGroup = customMealInfos.groupBy { it.customCategory }
+
+
+                        _state.update { currentState ->
+                            currentState.copy(
+                                isLoading = false, // Desactivamos el loading principal
+                                groupedMeals = currentState.groupedMeals + newGroup // Añadimos el nuevo grupo
+                            )
                         }
                     }
-                    val detailedResponses = detailedMealsDeferred.awaitAll()
-
-                    val customMealInfos = detailedResponses.mapNotNull { response ->
-                        response.meals.firstOrNull()?.toCustomMealInfo()
-                    }
-
-                    val grouped = customMealInfos.groupBy { it.customCategory }
-
-                    // resultado exitoso
-                    Result.success(grouped)
-
                 } catch (e: Exception) {
-                    //  error
-                    Result.failure(e)
-                }
-            }
 
-
-            result.onSuccess { groupedMeals ->
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        groupedMeals = groupedMeals,
-                        error = null
-                    )
-                }
-            }.onFailure { exception ->
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        error = "Error al obtener las recetas: ${exception.message}"
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Error al obtener las recetas: ${e.message}"
+                        )
+                    }
                 }
             }
         }
