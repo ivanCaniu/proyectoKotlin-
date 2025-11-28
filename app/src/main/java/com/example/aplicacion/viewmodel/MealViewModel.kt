@@ -2,51 +2,84 @@ package com.example.aplicacion.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.aplicacion.data.remote.MealApiService
-import com.example.aplicacion.model.Meal
+import com.example.aplicacion.model.MealScreenState
+import com.example.aplicacion.network.RetrofitClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 
-// Estado de la pantalla de lista de comidas
-data class MealState(
-    val meals: List<Meal> = emptyList(),
-    val isLoading: Boolean = false,
-    val error: String? = null
-)
 
 class MealViewModel : ViewModel() {
 
-    private val _state = MutableStateFlow(MealState())
-    val state: StateFlow<MealState> = _state.asStateFlow()
-
-    private val apiService: MealApiService
+    private val _state = MutableStateFlow(MealScreenState())
+    val state = _state.asStateFlow()
 
     init {
-        // Inicializar Retrofit
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://www.themealdb.com/api/json/v1/1/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        apiService = retrofit.create(MealApiService::class.java)
-
-        // Cargar las comidas al iniciar el ViewModel
-        fetchMeals()
+        val categoriesToFetch = listOf("Seafood", "Breakfast", "Chicken", "Dessert", "Pasta")
+        fetchAllCategories(categoriesToFetch)
     }
 
-    private fun fetchMeals() {
+    private fun fetchAllCategories(categories: List<String>) {
         viewModelScope.launch {
-            _state.value = MealState(isLoading = true)
-            try {
-                val response = apiService.getMeals()
-                _state.value = MealState(meals = response.meals)
-            } catch (e: Exception) {
-                _state.value = MealState(error = "Error al cargar las comidas: ${e.message}")
+            _state.update { it.copy(isLoading = true) }
+
+
+            val result = withContext(Dispatchers.IO) {
+                try {
+
+                    val categoryResponses = categories.map { categoryName ->
+                        async {
+                            RetrofitClient.mealApiService.getMealsByCategory(categoryName)
+                        }
+                    }.awaitAll()
+
+                    val allMealsFromApi = categoryResponses.flatMap { it.meals }
+
+                    val detailedMealsDeferred = allMealsFromApi.map { meal ->
+                        async {
+                            RetrofitClient.mealApiService.getMealDetails(meal.id)
+                        }
+                    }
+                    val detailedResponses = detailedMealsDeferred.awaitAll()
+
+                    val customMealInfos = detailedResponses.mapNotNull { response ->
+                        response.meals.firstOrNull()?.toCustomMealInfo()
+                    }
+
+                    val grouped = customMealInfos.groupBy { it.customCategory }
+
+                    // resultado exitoso
+                    Result.success(grouped)
+
+                } catch (e: Exception) {
+                    //  error
+                    Result.failure(e)
+                }
+            }
+
+
+            result.onSuccess { groupedMeals ->
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        groupedMeals = groupedMeals,
+                        error = null
+                    )
+                }
+            }.onFailure { exception ->
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "Error al obtener las recetas: ${exception.message}"
+                    )
+                }
             }
         }
     }
 }
+
