@@ -21,26 +21,22 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.aplicacion.ui.theme.componets.ProfileImagePicker
 import com.example.aplicacion.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditarPerfilScreen(navController: NavController, viewModel: MainViewModel = viewModel()) {
+fun EditarPerfilScreen(
+    navController: NavController,
+    viewModel: MainViewModel
+) {
+    val formState by viewModel.editFormState.collectAsState()
     val userProfile by viewModel.userProfile.collectAsState()
-
-    var nombre by remember(userProfile.name) { mutableStateOf(userProfile.name) }
-    var email by remember(userProfile.email) { mutableStateOf(userProfile.email) }
-    var bio by remember(userProfile.bio) { mutableStateOf(userProfile.bio) }
 
     Scaffold(
         topBar = {
@@ -48,55 +44,88 @@ fun EditarPerfilScreen(navController: NavController, viewModel: MainViewModel = 
                 title = { Text("Editar Perfil") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Regresar"
+                        )
                     }
                 }
             )
         }
-    ) {
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
+                .padding(paddingValues)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProfileImagePicker(imageUri = userProfile.imageUri, onImageUriChanged = { newUri -> viewModel.updateProfileImage(newUri) })
+            ProfileImagePicker(
+                imageUri = userProfile.imageUri,
+                onImageUriChanged = { newUri -> viewModel.updateProfileImage(newUri) }
+            )
+
             Spacer(modifier = Modifier.height(24.dp))
+
             OutlinedTextField(
-                value = nombre,
-                onValueChange = { nombre = it },
+                value = formState.name,
+                onValueChange = { newName ->
+                    viewModel.onProfileFormFieldChange(newName, formState.email, formState.bio)
+                },
                 label = { Text("Nombre") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                isError = formState.nameError != null,
+                supportingText = {
+                    if (formState.nameError != null) {
+                        Text(text = formState.nameError!!)
+                    }
+                }
             )
+
             Spacer(modifier = Modifier.height(16.dp))
+
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Correo Electrónico") },
-                modifier = Modifier.fillMaxWidth()
+                value = formState.email,
+                onValueChange = { newEmail ->
+                    viewModel.onProfileFormFieldChange(formState.name, newEmail, formState.bio)
+                },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                isError = formState.emailError != null,
+                supportingText = {
+                    if (formState.emailError != null) {
+                        Text(text = formState.emailError!!)
+                    }
+                }
             )
-            Spacer(modifier = Modifier.height(16.dp))
+
+             Spacer(modifier = Modifier.height(16.dp))
+
             OutlinedTextField(
-                value = bio,
-                onValueChange = { bio = it },
+                value = formState.bio,
+                onValueChange = { newBio ->
+                    viewModel.onProfileFormFieldChange(formState.name, formState.email, newBio)
+                },
                 label = { Text("Biografía") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp)
             )
+
             Spacer(modifier = Modifier.height(32.dp))
+
             Button(
                 onClick = {
-                    viewModel.updateUserProfile(nombre, email, bio)
+                    viewModel.updateUserProfile()
                     navController.popBackStack()
-                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
+                },
+                enabled = formState.isSaveEnabled,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Guardar Cambios", fontWeight = FontWeight.Bold)
+                Text("Guardar Cambios")
             }
         }
     }

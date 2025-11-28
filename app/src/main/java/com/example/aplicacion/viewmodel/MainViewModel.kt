@@ -1,8 +1,11 @@
 package com.example.aplicacion.viewmodel
 
 import android.net.Uri
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.aplicacion.model.EditProfileFormState
+import com.example.aplicacion.model.UserProfile
 import com.example.aplicacion.navegation.AppScreens
 import com.example.aplicacion.navegation.NavigationEvent
 import com.example.aplicacion.navegation.Screen
@@ -14,30 +17,57 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-data class UserProfile(
-    val name: String = "Ivan",
-    val email: String = "ivan.developer@email.com",
-    val bio: String = "Apasionado por el desarrollo de apps con Jetpack Compose.",
-    val imageUri: Uri? = null
-)
 
 class MainViewModel: ViewModel() {
 
     private val _userProfile = MutableStateFlow(UserProfile())
     val userProfile: StateFlow<UserProfile> = _userProfile.asStateFlow()
 
-    fun updateUserProfile(name: String, email: String, bio: String) {
-        _userProfile.value = _userProfile.value.copy(
-            name = name,
-            email = email,
-            bio = bio
-        )
+    private val _editFormState = MutableStateFlow(EditProfileFormState())
+    val editFormState: StateFlow<EditProfileFormState> = _editFormState.asStateFlow()
+
+    init {
+        _editFormState.update {
+            it.copy(
+                name = _userProfile.value.name,
+                email = _userProfile.value.email,
+                bio = _userProfile.value.bio
+            )
+        }
+    }
+
+    fun onProfileFormFieldChange(name: String, email: String, bio: String) {
+        val nameError = if (name.isBlank()) "El nombre no puede estar vacío" else null
+        val emailError = if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) "El correo no es válido" else null
+
+        _editFormState.update {
+            it.copy(
+                name = name,
+                email = email,
+                bio = bio,
+                nameError = nameError,
+                emailError = emailError,
+                isSaveEnabled = nameError == null && emailError == null
+            )
+        }
+    }
+
+    fun updateUserProfile() {
+        if (_editFormState.value.isSaveEnabled) {
+            _userProfile.update {
+                it.copy(
+                    name = _editFormState.value.name,
+                    email = _editFormState.value.email,
+                    bio = _editFormState.value.bio
+                )
+            }
+        }
     }
 
     fun updateProfileImage(uri: Uri?) {
-        _userProfile.value = _userProfile.value.copy(imageUri = uri)
+        _userProfile.update { it.copy(imageUri = uri) }
     }
 
     private val _navigationsEvents = MutableSharedFlow<NavigationEvent>()
