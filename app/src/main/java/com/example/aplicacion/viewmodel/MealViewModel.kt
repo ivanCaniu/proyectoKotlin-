@@ -20,7 +20,6 @@ class MealViewModel : ViewModel() {
     val state = _state.asStateFlow()
 
     init {
-        // Lista de categorías que queremos cargar progresivamente
         val categoriesToFetch = listOf("Seafood", "Breakfast", "Chicken", "Dessert", "Pasta")
         fetchCategoriesProgressively(categoriesToFetch)
     }
@@ -37,7 +36,7 @@ class MealViewModel : ViewModel() {
                     categories.forEach { categoryName ->
 
                         val mealListResponse = RetrofitClient.mealApiService.getMealsByCategory(categoryName)
-                        val mealsFromApi = mealListResponse.meals.take(8) // Limitamos a 8
+                        val mealsFromApi = mealListResponse.meals.take(8)
 
 
                         val detailedMeals = mealsFromApi.map { meal ->
@@ -57,7 +56,7 @@ class MealViewModel : ViewModel() {
 
                         _state.update { currentState ->
                             currentState.copy(
-                                isLoading = false, // Desactivamos el loading principal
+                                isLoading = false,
                                 groupedMeals = currentState.groupedMeals + newGroup // Añadimos el nuevo grupo
                             )
                         }
