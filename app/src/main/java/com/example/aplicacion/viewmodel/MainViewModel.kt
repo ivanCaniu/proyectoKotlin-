@@ -9,8 +9,6 @@ import com.example.aplicacion.model.UserProfile
 import com.example.aplicacion.navegation.AppScreens
 import com.example.aplicacion.navegation.NavigationEvent
 import com.example.aplicacion.navegation.Screen
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -20,7 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MainViewModel: ViewModel() {
+class MainViewModel : ViewModel() {
 
     private val _userProfile = MutableStateFlow(UserProfile())
     val userProfile: StateFlow<UserProfile> = _userProfile.asStateFlow()
@@ -66,13 +64,20 @@ class MainViewModel: ViewModel() {
         }
     }
 
+    // --- Nueva Función ---
+    fun saveChangesAndNavigateBack() {
+        if (_editFormState.value.isSaveEnabled) {
+            updateUserProfile()
+            navigateBack()
+        }
+    }
+
     fun updateProfileImage(uri: Uri?) {
         _userProfile.update { it.copy(imageUri = uri) }
     }
 
     private val _navigationsEvents = MutableSharedFlow<NavigationEvent>()
-
-    val navigationsEvents : SharedFlow<NavigationEvent> = _navigationsEvents.asSharedFlow()
+    val navigationsEvents: SharedFlow<NavigationEvent> = _navigationsEvents.asSharedFlow()
 
     fun navigateTo(route: String, popUpTo: String? = null, inclusive: Boolean = false, singleTop: Boolean = false) {
         viewModelScope.launch {
@@ -100,7 +105,6 @@ class MainViewModel: ViewModel() {
     }
 
     fun onLogoutClick() {
-
         navigateTo(
             route = Screen.Login.route,
             popUpTo = Screen.Home.route,
@@ -108,14 +112,14 @@ class MainViewModel: ViewModel() {
         )
     }
 
-    fun navigateBack(){
-        CoroutineScope(Dispatchers.Main).launch {
+    private fun navigateBack() {
+        viewModelScope.launch {
             _navigationsEvents.emit(NavigationEvent.PopBackStack)
         }
     }
 
-    fun navigateUp(){
-        CoroutineScope(Dispatchers.Main).launch {
+    fun navigateUp() {
+        viewModelScope.launch {
             _navigationsEvents.emit(NavigationEvent.NavigateUp)
         }
     }

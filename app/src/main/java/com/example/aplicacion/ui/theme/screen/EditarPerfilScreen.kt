@@ -118,10 +118,7 @@ fun EditarPerfilScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
-                onClick = {
-                    viewModel.updateUserProfile()
-                    navController.popBackStack()
-                },
+                onClick = { viewModel.saveChangesAndNavigateBack() },
                 enabled = formState.isSaveEnabled,
                 modifier = Modifier.fillMaxWidth()
             ) {
