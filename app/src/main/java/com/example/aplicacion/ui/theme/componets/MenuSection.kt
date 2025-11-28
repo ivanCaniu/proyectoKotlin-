@@ -21,9 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 
 @Composable
-fun MenuSection() {
+fun MenuSection(navController: NavController) {
     Text(
         text = "Ajustes de la Cuenta",
         style = MaterialTheme.typography.titleMedium,
@@ -31,9 +32,9 @@ fun MenuSection() {
         modifier = Modifier.padding(horizontal = 16.dp)
     )
     Spacer(modifier = Modifier.height(8.dp))
-    ProfileMenuItem(icon = Icons.Default.Edit, text = "Editar Perfil") { /* Acción al hacer clic */ }
-    ProfileMenuItem(icon = Icons.Default.NotificationsNone, text = "Notificaciones") { /* Acción al hacer clic */ }
-    ProfileMenuItem(icon = Icons.Default.HelpOutline, text = "Ayuda y Soporte") { /* Acción al hacer clic */ }
+    ProfileMenuItem(icon = Icons.Default.Edit, text = "Editar Perfil") { navController.navigate("editar_perfil") }
+    ProfileMenuItem(icon = Icons.Default.NotificationsNone, text = "Notificaciones") { navController.navigate("notificaciones") }
+    ProfileMenuItem(icon = Icons.Default.HelpOutline, text = "Ayuda y Soporte") { navController.navigate("ayuda_soporte") }
 }
 
 @Composable

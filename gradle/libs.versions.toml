@@ -10,7 +10,8 @@ activityCompose = "1.8.0"
 composeBom = "2024.09.00"
 navigation = "2.7.7" # Unificada para Navigation
 coroutines = "1.8.0"
-webkit = "1.14.0" # Añadida para Coroutines
+webkit = "1.14.0"
+foundationLayout = "1.9.5" # Añadida para Coroutines
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +36,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 # Coroutines
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "webkit" }
+androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

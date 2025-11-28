@@ -11,8 +11,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.aplicacion.ui.theme.componets.LogoutButton
 import com.example.aplicacion.ui.theme.componets.MenuSection
 import com.example.aplicacion.ui.theme.componets.ProfileHeader
@@ -23,21 +28,25 @@ import com.example.aplicacion.viewmodel.MainViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    viewModel: MainViewModel,
-    userId: String
+    viewModel: MainViewModel = viewModel(),
+    userId: String,
+    navController: NavController
 ) {
+    val userProfile by viewModel.userProfile.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
             .verticalScroll(rememberScrollState())
-            .padding(bottom = 16.dp)
+            .padding(bottom = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // 1. Encabezado del perfil
         ProfileHeader(
-            name = "Ivan", // Reemplazar con los datos del usuario, ej: user.value?.name
-            email = "ivan.developer@email.com" // Reemplazar con los datos del usuario, ej: user.value?.email
+            name = userProfile.name,
+            email = userProfile.email,
+            imageUri = userProfile.imageUri
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -48,14 +57,11 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // 3. Menú de opciones de la cuenta
-        MenuSection()
+        MenuSection(navController = navController)
 
         Spacer(modifier = Modifier.height(24.dp))
 
         // 4. Botón para cerrar sesión
-        LogoutButton(onLogout = {
-            // Aquí puedes llamar a una función en tu viewModel para cerrar la sesión
-            // viewModel.logout()
-        })
+        LogoutButton(onLogout = { viewModel.logout() })
     }
 }

@@ -25,7 +25,7 @@ fun RutinaCard(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
-        // Fila horizontal de ejercicios que se puede desplazar
+        // Fila horizontal de ejercicios
         LazyRow(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -34,11 +34,11 @@ fun RutinaCard(
                 items = rutina.ejercicios,
                 key = { it.id }
             ) { ejercicio ->
-                // Reutilizamos el EjercicioCard que ya tenías, pero le damos un tamaño fijo
+
                 EjercicioCard(
                     ejercicio = ejercicio,
                     navController = navController,
-                    modifier = Modifier.width(200.dp) // Ancho fijo para que quepan varias en pantalla
+                    modifier = Modifier.width(200.dp) // Ancho
                 )
             }
         }

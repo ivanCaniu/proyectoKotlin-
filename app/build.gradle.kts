@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.material:material-icons-extended-android:1.6.8")
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
     // Navigation y Coroutines (desde el catálogo)
     implementation(libs.androidx.navigation.runtime.ktx)

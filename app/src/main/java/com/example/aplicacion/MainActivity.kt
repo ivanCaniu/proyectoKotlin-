@@ -10,13 +10,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
@@ -25,9 +23,12 @@ import com.example.aplicacion.navegation.NavigationEvent
 import com.example.aplicacion.ui.theme.AplicacionTheme
 import com.example.aplicacion.ui.theme.componets.BottomNavigationBar
 import com.example.aplicacion.ui.theme.screen.AlimetoScreen
+import com.example.aplicacion.ui.theme.screen.AyudaSoporteScreen
+import com.example.aplicacion.ui.theme.screen.EditarPerfilScreen
 import com.example.aplicacion.ui.theme.screen.EjercicioDetailScreen
 import com.example.aplicacion.ui.theme.screen.HomeScreen
 import com.example.aplicacion.ui.theme.screen.LoginScreen
+import com.example.aplicacion.ui.theme.screen.NotificacionesScreen
 import com.example.aplicacion.ui.theme.screen.ProfileScreen
 import com.example.aplicacion.ui.theme.screen.RegistroScreen
 import com.example.aplicacion.viewmodel.MainViewModel
@@ -102,7 +103,7 @@ class MainActivity : ComponentActivity() {
                             )
                         ) { backStackEntry ->
                             val userId = backStackEntry.arguments?.getString("userId") ?: ""
-                            ProfileScreen(viewModel = viewModel, userId = userId)
+                            ProfileScreen(viewModel = viewModel, userId = userId, navController = navController)
                         }
 
                         composable(route = "registro"){
@@ -112,6 +113,10 @@ class MainActivity : ComponentActivity() {
                         composable(route = "login"){
                             LoginScreen(navController = navController, viewModel = viewModel<UsuarioViewModel>())
                         }
+
+                        composable("editar_perfil") { EditarPerfilScreen(navController = navController, viewModel = viewModel) }
+                        composable("notificaciones") { NotificacionesScreen(navController) }
+                        composable("ayuda_soporte") { AyudaSoporteScreen(navController) }
 
                         composable(
                             route = "ejercicio_detail/{ejercicioId}",
