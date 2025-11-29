@@ -27,6 +27,7 @@ import com.example.aplicacion.ui.theme.screen.EditarPerfilScreen
 import com.example.aplicacion.ui.theme.screen.EjercicioDetailScreen
 import com.example.aplicacion.ui.theme.screen.HomeScreen
 import com.example.aplicacion.ui.theme.screen.LoginScreen
+import com.example.aplicacion.ui.theme.screen.MealDetailScreen
 import com.example.aplicacion.ui.theme.screen.MealListScreen
 import com.example.aplicacion.ui.theme.screen.NotificacionesScreen
 import com.example.aplicacion.ui.theme.screen.ProfileScreen
@@ -90,7 +91,44 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(route = AppScreens.Foods.route) {
-                            MealListScreen()
+                            MealListScreen(
+                                onMealClick = { mealId ->
+                                    navController.navigate("meal_detail/$mealId")
+                                }
+                            )
+                        }
+
+                        composable(
+
+                            route = "meal_detail/{mealId}",
+                            arguments = listOf(navArgument("mealId") { type = NavType.StringType }),
+
+                            enterTransition = {
+                                slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(700))
+                            },
+                            exitTransition = {
+                                slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(700))
+                            },
+                            popEnterTransition = {
+                                slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(700))
+                            },
+                            popExitTransition = {
+                                slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(700))
+                            }
+                        ) { backStackEntry ->
+
+                            val mealId = backStackEntry.arguments?.getString("mealId")
+
+                            // Es una buena práctica asegurarse de que el ID no es nulo
+                            requireNotNull(mealId) { "El ID de la comida no puede ser nulo" }
+
+                            // Llamamos a la pantalla de detalle que ya creaste
+                            MealDetailScreen(
+                                mealId = mealId,
+                                onNavigateBack = {
+                                    navController.popBackStack() // Acción para volver a la pantalla anterior
+                                }
+                            )
                         }
 
                         composable(

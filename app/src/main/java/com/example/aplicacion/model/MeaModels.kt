@@ -78,7 +78,8 @@ data class MealDetails(
             calories = calories,
             prepTimeMinutes = prepTime,
             customCategory = customCategory,
-            ingredients = ingredients
+            ingredients = ingredients,
+            instructions = this.instructions
         )
     }
 }
@@ -92,6 +93,7 @@ data class CustomMealInfo(
     val calories: Int,
     val prepTimeMinutes: Int,
     val customCategory: String,
-    val ingredients: String
+    val ingredients: String,
+    val instructions: String
 )
 

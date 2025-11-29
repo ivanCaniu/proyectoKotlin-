@@ -19,7 +19,8 @@ import com.example.aplicacion.ui.theme.screen.MealCard
 fun MealCategoryRow(
     categoryName: String,
     meals: List<CustomMealInfo>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onMealClick: (String) -> Unit
 ){
     Column(modifier) {
         Text(
@@ -33,7 +34,10 @@ fun MealCategoryRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ){
             items(meals){ meal ->
-                MealCard(meal = meal,modifier = Modifier.width(200.dp))
+                MealCard(
+                    meal = meal, modifier = Modifier.width(200.dp),
+                    onCLick = { onMealClick(meal.id)}
+                )
 
             }
         }

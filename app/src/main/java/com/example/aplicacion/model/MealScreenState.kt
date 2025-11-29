@@ -3,7 +3,8 @@ package com.example.aplicacion.model
 data class MealScreenState(
     val isLoading: Boolean = false,
     val groupedMeals: Map<String, List<CustomMealInfo>> = emptyMap(),
-    val error: String? = null
+    val error: String? = null,
+    val selectedMeal: CustomMealInfo? = null
 
 )
 
