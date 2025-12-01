@@ -41,8 +41,8 @@ data class MealDetails(
 
 
 
-        val calories = (300..800).random() // Un valor aleatorio entre 300 y 800
-        val prepTime = (15..60).random()   // Un valor aleatorio entre 15 y 60 minutos
+        val calories = (300..800).random()
+        val prepTime = (15..60).random()
 
         // 2. Determinar la categoría personalizada
         val customCategory = when {

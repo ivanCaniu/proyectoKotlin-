@@ -2,105 +2,83 @@ package com.example.aplicacion.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.aplicacion.model.UsuarioErrores
-import com.example.aplicacion.model.UsuarioUIState
-import com.example.aplicacion.navegation.Screen
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
+import com.example.aplicacion.model.auth.LoginDTO
+import com.example.aplicacion.model.auth.RegistroDTO
+import com.example.aplicacion.network.AuthRetrofitClient
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+// Estado para la UI, para comunicar éxito, error o carga.
+data class AuthState(
+    val isLoading: Boolean = false,
+    val successMessage: String? = null,
+    val errorMessage: String? = null
+)
 
 class UsuarioViewModel : ViewModel() {
 
-    private val _estado = MutableStateFlow(value = UsuarioUIState())
-    val estado: StateFlow<UsuarioUIState> = _estado
+    private val _authState = MutableStateFlow(AuthState())
+    val authState = _authState.asStateFlow()
 
-    private val _navigationEvent = MutableSharedFlow<String>()
-    val navigationEvent = _navigationEvent.asSharedFlow()
-
-    fun onRegistroClick() {
+    fun register(registroDTO: RegistroDTO) {
         viewModelScope.launch {
-            _estado.update { it.copy(isLoading = true) }
-            delay(1000)
-            val hayError = validarFormulario()
-            if (!hayError) {
-                _navigationEvent.emit(Screen.Home.route)
+            // 1. Poner la UI en estado de carga
+            _authState.update { it.copy(isLoading = true, errorMessage = null, successMessage = null) }
+
+            try {
+                // 2. Ejecutar la llamada a la API en un hilo de fondo
+                val response = withContext(Dispatchers.IO) {
+                    AuthRetrofitClient.authApiService.register(registroDTO)
+                }
+
+                // 3. Procesar la respuesta
+                if (response.isSuccessful) {
+                    _authState.update {
+                        it.copy(isLoading = false, successMessage = "¡Registro exitoso! Ahora puedes iniciar sesión.")
+                    }
+                } else {
+                    // El servidor devolvió un error (ej. email ya en uso)
+                    val errorBody = response.errorBody()?.string() ?: "Error desconocido"
+                    _authState.update { it.copy(isLoading = false, errorMessage = errorBody) }
+                }
+            } catch (e: Exception) {
+                // Error de red (ej. no se puede conectar al servidor)
+                _authState.update { it.copy(isLoading = false, errorMessage = "Error de conexión: ${e.message}") }
             }
-            _estado.update { it.copy(isLoading = false) }
         }
     }
 
-    fun onLoginClick() {
+    fun login(loginDTO: LoginDTO) {
         viewModelScope.launch {
-            _estado.update { it.copy(isLoading = true) }
-            delay(1000)
-            val hayErrorDeFormato = validarLogin()
-            if (!hayErrorDeFormato) {
-                _navigationEvent.emit(Screen.Home.route)
+            // 1. Poner la UI en estado de carga
+            _authState.update { it.copy(isLoading = true, errorMessage = null, successMessage = null) }
+
+            try {
+                // 2. Ejecutar la llamada a la API en un hilo de fondo
+                val response = withContext(Dispatchers.IO) {
+                    AuthRetrofitClient.authApiService.login(loginDTO)
+                }
+
+                // 3. Procesar la respuesta
+                if (response.isSuccessful) {
+                    val loginResponse = response.body()
+                    _authState.update {
+                        it.copy(isLoading = false, successMessage = loginResponse?.message ?: "Login exitoso")
+                    }
+                    // Aquí, en un futuro, guardarías el 'token' de forma segura
+                } else {
+                    // El servidor devolvió un error (ej. contraseña incorrecta)
+                    _authState.update { it.copy(isLoading = false, errorMessage = "Email o contraseña incorrectos.") }
+                }
+            } catch (e: Exception) {
+                // Error de red
+                _authState.update { it.copy(isLoading = false, errorMessage = "Error de conexión: ${e.message}") }
             }
-            _estado.update { it.copy(isLoading = false) }
         }
-    }
-
-    fun onNombreChanged(valor: String) {
-        _estado.update { it.copy(nombre = valor, errores = it.errores.copy(nombre = null)) }
-    }
-
-    fun onApellidoChanged(valor: String) {
-        _estado.update { it.copy(apellido = valor, errores = it.errores.copy(apellido = null)) }
-    }
-
-    fun onEmailChanged(valor: String) {
-        _estado.update { it.copy(email = valor, errores = it.errores.copy(email = null)) }
-    }
-
-    fun onContraseñaChanged(valor: String) {
-        _estado.update { it.copy(contraseña = valor, errores = it.errores.copy(contraseña = null)) }
-    }
-
-    fun onConfirmarContraseñaChanged(valor: String) {
-        _estado.update { it.copy(confirmarContraseña = valor, errores = it.errores) }
-    }
-
-    fun onAceptaTerminosChanged(valor: Boolean) {
-        _estado.update { it.copy(aceptaTerminos = valor, errores = it.errores.copy(aceptaTerminos = null)) }
-    }
-
-    private fun validarFormulario(): Boolean {
-        val estadoActual = _estado.value
-        val errores = UsuarioErrores(
-            nombre = if (estadoActual.nombre.isBlank()) "El Nombre es requerido" else null,
-            apellido = if (estadoActual.apellido.isBlank()) " El Apellido es requerido" else null,
-            email = if (!estadoActual.email.contains("@")) "Correo inválido" else null,
-            contraseña = if (estadoActual.contraseña.length < 6) "Contraseña inválida" else null,
-            confirmarContraseña = if (estadoActual.confirmarContraseña != estadoActual.contraseña) "Las contraseñas no coinciden" else null,
-            aceptaTerminos = if (!estadoActual.aceptaTerminos) "Debe aceptar los términos" else null
-        )
-
-        val hayErrores = listOfNotNull(
-            errores.nombre,
-            errores.apellido,
-            errores.email,
-            errores.contraseña,
-            errores.confirmarContraseña,
-            errores.aceptaTerminos
-        ).isNotEmpty()
-
-        _estado.update { it.copy(errores = errores) }
-        return hayErrores
-    }
-
-    private fun validarLogin(): Boolean {
-        val estadoActual = _estado.value
-        val errores = UsuarioErrores(
-            email = if (estadoActual.email.isBlank()) "El email es requerido" else null,
-            contraseña = if (estadoActual.contraseña.isBlank()) "La contraseña es requerida" else null
-        )
-        val hayErrores = listOfNotNull(errores.email, errores.contraseña).isNotEmpty()
-        _estado.update { it.copy(errores = errores) }
-        return hayErrores
     }
 }
+
